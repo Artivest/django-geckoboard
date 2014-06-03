@@ -7,8 +7,8 @@ from django.http import HttpRequest, HttpResponseForbidden
 from django.utils.datastructures import SortedDict
 
 from django_geckoboard.decorators import widget, number_widget, rag_widget, \
-        text_widget, pie_chart, line_chart, geck_o_meter, TEXT_NONE, \
-        TEXT_INFO, TEXT_WARN, funnel, bullet
+        text_widget, list_widget, pie_chart, line_chart, geck_o_meter, \
+        TEXT_NONE, TEXT_INFO, TEXT_WARN, funnel, bullet
 from django_geckoboard.tests.utils import TestCase
 import base64
 
@@ -302,22 +302,25 @@ class ListDecoratorTestCase(TestCase):
     def test_string(self):
         widget = list_widget(lambda r: "test message")
         resp = widget(self.request)
-        self.assertEqual('{"item": [{"title": {"text": test message"}]}',
+        self.assertEqual('{"item": [{"title": {"text": "test message"}}]}',
                 resp.content)
 
     def test_list(self):
-        widget = text_widget(lambda r: ["test1", "test2"])
+        widget = list_widget(lambda r: ["test1", "test2"])
         resp = widget(self.request)
-        self.assertEqual('{"item": [{"text": "test1", "type": 0}, '
-                '{"text": "test2", "type": 0}]}', resp.content)
+        self.assertEqual('{"item": ['
+            '{"title": {"text": "test1"}}, '
+            '{"title": {"text": "test2"}}]}', resp.content)
 
     def test_list_dict(self):
-        widget = text_widget(lambda r: [("test1", TEXT_NONE),
-                ("test2", TEXT_INFO), ("test3", TEXT_WARN)])
+        widget = list_widget(lambda r:
+            [{"label": {"name": "test1", "color": "#FFFFFF"}, "title": {"text": "test1title", "highlight": False}, "description": "test1desc"},
+            {"label": {"name": "test2", "color": "#AAAAAA"}, "title": {"text": "test2title", "highlight": True}, "description": "test2desc"}])
         resp = widget(self.request)
-        self.assertEqual('{"item": [{"text": "test1", "type": 0}, '
-                '{"text": "test2", "type": 2}, '
-                '{"text": "test3", "type": 1}]}', resp.content)
+        self.assertEqual('{"item": ['
+            '{"title": {"text": "test1title", "highlight": false}, "description": "test1desc", "label": {"color": "#FFFFFF", "name": "test1"}}, '
+            '{"title": {"text": "test2title", "highlight": true}, "description": "test2desc", "label": {"color": "#AAAAAA", "name": "test2"}}]}',
+            resp.content)
 
 
 class PieChartDecoratorTestCase(TestCase):

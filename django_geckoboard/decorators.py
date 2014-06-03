@@ -182,20 +182,12 @@ class ListWidgetDecorator(WidgetDecorator):
         if not isinstance(result, (tuple, list)):
             result = [result]
         for elem in result:
-            item = SortedDict()
-            item['title'] = SortedDict()
-
-            if not isinstance(elem, (dict,)):
-                item['title']['text'] = elem    
+            if isinstance(elem, (dict,)):
+                item = SortedDict(elem)
             else:
-                item['title']['text'] = elem['title'][0] if 'title' in elem.keys() else None
-                item['title']['highlight'] = elem['title'][1] if 'title' in elem.keys() and len(elem['title']) > 0 else None
-
-                item['label'] = SortedDict()
-                item['label']['name'] = elem['label'][0]
-                item['label']['color'] = elem['label'][1] if len(elem['label']) > 1 else None
-
-                item['description'] = elem['description'] if 'description' in elem.keys() else None
+                item = SortedDict()
+                item['title'] = SortedDict()
+                item['title']['text'] = elem
 
             items.append(item)
         return {'item': items}
