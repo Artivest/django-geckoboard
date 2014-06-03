@@ -287,6 +287,38 @@ class TextDecoratorTestCase(TestCase):
                 '{"text": "test2", "type": 2}, '
                 '{"text": "test3", "type": 1}]}', resp.content)
 
+# TODO:  Add the tests
+class ListDecoratorTestCase(TestCase):
+    """
+    Tests for the ``list`` decorator.
+    """
+
+    def setUp(self):
+        super(ListDecoratorTestCase, self).setUp()
+        self.settings_manager.delete('GECKOBOARD_API_KEY')
+        self.request = HttpRequest()
+        self.request.POST['format'] = '2'
+
+    def test_string(self):
+        widget = list_widget(lambda r: "test message")
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"title": {"text": test message"}]}',
+                resp.content)
+
+    def test_list(self):
+        widget = text_widget(lambda r: ["test1", "test2"])
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"text": "test1", "type": 0}, '
+                '{"text": "test2", "type": 0}]}', resp.content)
+
+    def test_list_dict(self):
+        widget = text_widget(lambda r: [("test1", TEXT_NONE),
+                ("test2", TEXT_INFO), ("test3", TEXT_WARN)])
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"text": "test1", "type": 0}, '
+                '{"text": "test2", "type": 2}, '
+                '{"text": "test3", "type": 1}]}', resp.content)
+
 
 class PieChartDecoratorTestCase(TestCase):
     """

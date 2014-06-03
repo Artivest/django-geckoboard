@@ -169,6 +169,40 @@ class TextWidgetDecorator(WidgetDecorator):
 text_widget = TextWidgetDecorator
 
 
+class ListWidgetDecorator(WidgetDecorator):
+    """
+    Geckoboard List widget decorator.
+
+    The decorated view must return a list of {'label': (name, color), 
+    'title': (text, highlight), 'description': description} or a list strings
+    """
+
+    def _convert_view_result(self, result):
+        items = []
+        if not isinstance(result, (tuple, list)):
+            result = [result]
+        for elem in result:
+            item = SortedDict()
+            item['title'] = SortedDict()
+
+            if not isinstance(elem, (dict,)):
+                item['title']['text'] = elem    
+            else:
+                item['title']['text'] = elem['title'][0] if 'title' in elem.keys() else None
+                item['title']['highlight'] = elem['title'][1] if 'title' in elem.keys() and len(elem['title']) > 0 else None
+
+                item['label'] = SortedDict()
+                item['label']['name'] = elem['label'][0]
+                item['label']['color'] = elem['label'][1] if len(elem['label']) > 1 else None
+
+                item['description'] = elem['description'] if 'description' in elem.keys() else None
+
+            items.append(item)
+        return {'item': items}
+
+list_widget = ListWidgetDecorator
+
+
 class PieChartWidgetDecorator(WidgetDecorator):
     """
     Geckoboard Pie chart decorator.
